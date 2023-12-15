@@ -5,8 +5,8 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include "pqueue.h"
 
+#include <dstructs.h>
 /*
  * Funciones para obtener índices de distintos elementos del heap relativos al
  * índice de un nodo.
@@ -166,8 +166,8 @@ pqueue_enqueue(struct pqueue *const self, void *const dataptr,
         size_t new_size = self->size + 1;
         if (new_size >= self->reserved_space) {
             size_t new_reserved_space = self->reserved_space * 2;
-            self->elements = reallocarray(self->elements, new_reserved_space,
-                                          sizeof(struct element));
+            self->elements = realloc(
+                self->elements, new_reserved_space * sizeof(struct element));
             /*
              * Este es un error crítico que debe de manejarse mejor.
              */
@@ -196,8 +196,8 @@ pqueue_enqueue_elem(struct pqueue *const self, struct element elem)
         size_t new_size = self->size + 1;
         if (new_size >= self->reserved_space) {
             size_t new_reserved_space = self->reserved_space * 2;
-            self->elements = reallocarray(self->elements, new_reserved_space,
-                                          sizeof(struct element));
+            self->elements = realloc(
+                self->elements, new_reserved_space * sizeof(struct element));
             /*
              * Este es un error crítico que debe de manejarse mejor.
              */
