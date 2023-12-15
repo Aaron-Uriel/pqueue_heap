@@ -11,9 +11,8 @@
  * Funciones para obtener índices de distintos elementos del heap relativos al
  * índice de un nodo.
  */
-static inline size_t heap_parent(size_t index) {
-    return (index) ? (index - 1) / 2 : 0;
-}
+static inline
+size_t heap_parent(size_t index) { return (index) ? (index - 1) / 2 : 0; }
 static inline size_t heap_lchild(size_t index) { return 2 * index + 1; }
 static inline size_t heap_rchild(size_t index) { return 2 * index + 2; }
 
@@ -66,7 +65,7 @@ pqueue_sift_up(struct pqueue *self, size_t index)
         do {
             elem = &self->elements[index];
             parent = &self->elements[heap_parent(index)];
-            if (parent->priority < elem->priority) {
+            if (parent->priority > elem->priority) {
                 memswap(parent, elem, sizeof(*elem));
                 index = heap_parent(index);
             } else {
@@ -87,7 +86,7 @@ int32_t
 pqueue_sift_down(struct pqueue *self, size_t index)
 {
     if (self && index < self->size) {
-        struct element *elem, *lchild, *rchild, *max;
+        struct element *elem, *lchild, *rchild, *min;
         bool has_rchild;
         bool has_lchild;
         size_t max_index = index;
@@ -97,18 +96,18 @@ pqueue_sift_down(struct pqueue *self, size_t index)
             elem = &self->elements[index];
             lchild = (has_lchild)? &self->elements[heap_lchild(index)]: NULL;
             rchild = (has_rchild)? &self->elements[heap_rchild(index)]: NULL;
-            max = elem;
-            if (lchild && (!rchild || lchild->priority > rchild->priority)) {
-                max = lchild;
+            min = elem;
+            if (lchild && (!rchild || lchild->priority < rchild->priority)) {
+                min = lchild;
                 max_index = heap_lchild(index);
             }
             else if (lchild && rchild &&
-                     lchild->priority <= rchild->priority) {
-                max = rchild;
+                     lchild->priority >= rchild->priority) {
+                min = rchild;
                 max_index = heap_rchild(index);
             }
-            if (max->priority > elem->priority) {
-                if (memswap(max, elem, sizeof(*elem))) {
+            if (min->priority < elem->priority) {
+                if (memswap(min, elem, sizeof(*elem))) {
                     return 1;
                 }
                 index = max_index;
