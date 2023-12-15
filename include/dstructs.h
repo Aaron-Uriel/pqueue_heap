@@ -33,7 +33,8 @@ int32_t pqueue_enqueue_elem(struct pqueue *const self,
                                       struct element elem);
 void *pqueue_get_max(struct pqueue *const self);
 void *pqueue_dequeue(struct pqueue *const self);
-char *pqueue_strrepr(struct pqueue *const self, char **buf, size_t *bufsize);
+int32_t pqueue_set_priority(struct pqueue *const self, void *const dataptr,
+                            int8_t priority);
 void pqueue_print(struct pqueue *const self);
 void pqueue_print_heap(struct pqueue *const self);
 struct element pqueue_dequeue_elem(struct pqueue *const self);

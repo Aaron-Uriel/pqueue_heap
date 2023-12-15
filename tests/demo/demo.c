@@ -9,9 +9,10 @@
 char *options[] = {
     "Insertar dato.",
     "Extraer dato.",
+    "Cambiar prioridad.",
     "Salir."
 };
-char *const short_options = "ixq";
+char *const short_options = "ixcq";
 
 int32_t
 main(void)
@@ -48,6 +49,14 @@ main(void)
                 }
             }
             break;
+        case 'c':
+            printf("Ingrese valor seguido de la nueva prioridad: ");
+            if (scanf("%d %hhd", tmpdataptr, &tmppriority) == 2) {
+                if (!pqueue_set_priority(main_pqueue, tmpdataptr, tmppriority)) {
+                    printf("Prioridad de valor %d cambiada a %hhd.\n",
+                           *tmpdataptr, tmppriority);
+                }
+            }
         case 'x':
             if (pqueue_get_max(main_pqueue)) {
                 if (last_extracted.dataptr) { free(last_extracted.dataptr); }

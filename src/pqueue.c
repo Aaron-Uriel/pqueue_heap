@@ -121,6 +121,25 @@ pqueue_sift_down(struct pqueue *self, size_t index)
     return 0;
 }
 
+/*
+ * Busca un elemento dentro de la cola, en caso de no encontrarlo
+ * se regresa NULL.
+ */
+struct element *
+pqueue_search_element(struct pqueue *const self, void *const dataptr)
+{
+    struct element *elem = NULL;
+    if (self && dataptr) {
+        for (size_t i = 0; i < self->size; i += 1) {
+            if (self->elements[i].dataptr == dataptr) {
+                elem = &self->elements[i];
+                break;
+            }
+        }
+    }
+    return elem;
+}
+
 
 /*
  * Crea una nueva cola con prioridad y regresa su dirección.
@@ -265,42 +284,22 @@ pqueue_dequeue_elem(struct pqueue *const self)
 }
 
 /*
- * Altera una cadena recibida y guarda en ella una representación del heap de
- * prioridades de la cola en forma de cadena de caracteres.
- * En caso de que la representación de cadena no quepa en buf, se libera y crea
- * un nuevo buffer del tamaño adecuado.
+ * Cambia la prioridad de un elemento en la cola.
  */
-/*
- * Esta función no la uso porque intenté hacer algo 'interesante' pero
- * realmente es complicado hacer que funcione bien.
- */
-char *
-pqueue_strrepr(struct pqueue *const self, char **buf, size_t *bufsize)
+int32_t
+pqueue_set_priority(struct pqueue *const self, void *const dataptr, int8_t priority)
 {
-    if (self && self->size && buf && *buf && bufsize && *bufsize) {
-        /* 
-         * Esto puede fallar si máximo es 17 y otro elemento es de prioridad
-         * -100.
-         */
-        uint8_t number_slots = digits(self->elements[0].priority) + 2;
-        size_t reprsize = sizeof(char)*self->size*number_slots + 1;
-        if (*bufsize < reprsize) {
-            free(*buf);
-            *buf = malloc(reprsize);
-            *bufsize = reprsize;
-        }
-        if (*buf) {
-            size_t i;
-            for (i = 0; i < self->size - 1; i += 1) {
-                sprintf(*buf + i * number_slots, "%*hhd ",
-                        -number_slots, self->elements[i].priority);
-            }
-            sprintf(*buf + i * number_slots, "%*hhd\n", -number_slots,
-                    self->elements[self->size - 1].priority);
+    if (self && dataptr) {
+        struct element *elem = pqueue_search_element(self, dataptr);
+        if (elem) {
+            elem->priority = priority;
+            pqueue_sift_up(self, elem - self->elements);
+            pqueue_sift_down(self, elem - self->elements);
+            return 0;
         }
     }
-    return *buf;
-}
+    return 1;
+ }
 
 /*
  * Imprime las prioridades dentro del heap de la cola.
